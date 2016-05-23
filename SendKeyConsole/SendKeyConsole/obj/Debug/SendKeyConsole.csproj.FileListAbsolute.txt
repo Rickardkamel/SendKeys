@@ -1,0 +1,6 @@
+C:\Users\rickam\Desktop\ITM\SendKeyConsole\SendKeyConsole\bin\Debug\SendKeyConsole.exe.config
+C:\Users\rickam\Desktop\ITM\SendKeyConsole\SendKeyConsole\bin\Debug\SendKeyConsole.exe
+C:\Users\rickam\Desktop\ITM\SendKeyConsole\SendKeyConsole\bin\Debug\SendKeyConsole.pdb
+C:\Users\rickam\Desktop\ITM\SendKeyConsole\SendKeyConsole\obj\Debug\SendKeyConsole.csprojResolveAssemblyReference.cache
+C:\Users\rickam\Desktop\ITM\SendKeyConsole\SendKeyConsole\obj\Debug\SendKeyConsole.exe
+C:\Users\rickam\Desktop\ITM\SendKeyConsole\SendKeyConsole\obj\Debug\SendKeyConsole.pdb
