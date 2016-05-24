@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml.Linq;
 
 namespace SendKeyConsole
 {
@@ -13,68 +14,113 @@ namespace SendKeyConsole
     {
         [DllImport("User32.dll")]
         static extern int SetForegroundWindow(IntPtr point);
+
+        public static string filePath;
+        public static DateTime StartTime = DateTime.Now;
+        public static DateTime EndTime = DateTime.Now.AddHours(5);
         static void Main(string[] args)
         {
-            //SendKeys.SendWait("^" + "%" + "{RIGHT}");
-            //SendKeys.SendWait("^" + "%" + "{DOWN}");
-            //SendKeys.SendWait("^" + "%" + "{LEFT}");
-            //SendKeys.SendWait("^" + "%" + "{UP}");
+            Log startLog = new Log();
 
-            SendKeys.SendWait("^" + "{ESC}");
-            System.Threading.Thread.Sleep(500);
-            SendKeys.SendWait("Notepad");
-            System.Threading.Thread.Sleep(500);
-            SendKeys.SendWait("{ENTER}");
-            System.Threading.Thread.Sleep(500);
-            SendKeys.SendWait("%");
+            startLog.LogText("!!UPPDATERING STARTAD!! \n");
 
-            for (int i = 0; i < 4; i++)
+            try
             {
-                System.Threading.Thread.Sleep(500);
-                SendKeys.SendWait("{RIGHT}");
+                // Find the XML-document
+                var xmlFile = XDocument.Load("FilePath.xml");
+                // Parce out the path and execute the file
+                if (xmlFile.Root == null) return;
+                filePath = xmlFile.Root.Value;
+            }
+            catch (Exception e)
+            {
+                startLog.LogText("Fel vid XML-inläsningen \n" + e.Message);
+                Environment.Exit(1);
             }
 
+            try
+            {
+                Process.Start(filePath);
+            }
+            catch (Exception e)
+            {
+
+                startLog.LogText("Kunde inte hitta filen genom sökvägen i 'FilePath.xml' \n" + "SYSTEM MESSAGE:     " + e.Message);
+                Environment.Exit(1);
+            }
+
+            // Sleep 3 min
+            System.Threading.Thread.Sleep(180000);
+
+            // Alt
+            SendKeys.SendWait("%");
+            System.Threading.Thread.Sleep(2000);
+
+            // Right-arrow x3
+            for (int i = 0; i < 3; i++)
+            {
+                SendKeys.SendWait("{RIGHT}");
+                System.Threading.Thread.Sleep(2000);
+            }
+
+            // Down-arrow x2
             for (int i = 0; i < 2; i++)
             {
-                System.Threading.Thread.Sleep(500);
                 SendKeys.SendWait("{DOWN}");
+                System.Threading.Thread.Sleep(2000);
             }
 
-            System.Threading.Thread.Sleep(500);
-            SendKeys.SendWait("{ENTER}");
-            System.Threading.Thread.Sleep(500);
+            // Enter
+            System.Threading.Thread.Sleep(2000);
             SendKeys.SendWait("{ENTER}");
 
-            System.Threading.Thread.Sleep(500);
-            SendKeys.SendWait("Command completed!");
+            // Enter
+            System.Threading.Thread.Sleep(2000);
+            SendKeys.SendWait("{ENTER}");
 
+            // Enter
+            System.Threading.Thread.Sleep(2000);
+            SendKeys.SendWait("{ENTER}");
+
+            // Check for error messages
             while (true)
             {
-                System.Threading.Thread.Sleep(10000);
-                var pp = Process.GetProcesses().FirstOrDefault(x => x.MainWindowTitle == "Command Prompt");
-                if (pp != null)
-                {
-                    IntPtr h = pp.MainWindowHandle;
-                    SetForegroundWindow(h);
+                // Sleep 5 min
+                System.Threading.Thread.Sleep(300000);
 
+                var timeElapsed = DateTime.Now - StartTime;
+
+                // Get "Error" window
+                var error = Process.GetProcesses().FirstOrDefault(x => x.MainWindowTitle == "Error");
+
+                // Check if "Error" window is up
+                if (error != null)
+                {
+                    IntPtr h = error.MainWindowHandle;
+                    SetForegroundWindow(h);
+                    startLog.LogText("Stängde ner 'Error' rutan");
                     SendKeys.SendWait("{ENTER}");
                     break;
                 }
+
+                // Get "Lime EASY" window
+                var limeEasy = Process.GetProcesses().FirstOrDefault(x => x.MainWindowTitle == "LIME Easy");
+
+                // Check if "Lime EASY" window is up
+                if (limeEasy != null)
+                {
+                    IntPtr h = limeEasy.MainWindowHandle;
+                    SetForegroundWindow(h);
+                    startLog.LogText("Stängde ner 'LIME Easy' rutan");
+                    SendKeys.SendWait("{ENTER}");
+                }
+
+                if (timeElapsed < EndTime.TimeOfDay)
+                {
+                    startLog.LogText("!!UPPDATERING AVSLUTAD!!\n" + "-----------------------------------");
+                    Environment.Exit(1);
+                }
             }
-
-            //Process[] processlist = Process.GetProcesses();
-
-            //foreach (Process process in processlist)
-            //{
-            //    if (!String.IsNullOrEmpty(process.MainWindowTitle))
-            //    {
-            //        Console.WriteLine("Process: {0} ID: {1} Window title: {2}", process.ProcessName, process.Id, process.MainWindowTitle);
-            //    }
-            //}
-
-
-
-            Console.ReadKey();
         }
     }
 }
